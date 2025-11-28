@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>30岁 · 我和大家的关系桑基图</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      padding: 16px 24px;
+      border-bottom: 1px solid #1e293b;
+    }
+    #chart {
+      flex: 1;
+      padding: 8px 16px 16px;
+    }
+    #chart > div {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>30岁 · 我和大家的关系桑基图（自动更新）</h1>
+    <div style="font-size:12px;color:#94a3b8;">
+      朋友在飞书表单里的每一次填写，都会更新这张图。刷新页面即可看到最新结果。
+    </div>
+  </header>
+  <div id="chart"><div id="sankey"></div></div>
+
+  <!-- 引入 ECharts -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <script>
+    // 把这里替换为你的函数 URL
+    const FUNCTION_URL = "https://1388809978-5vlprix701.ap-guangzhou.tencentscf.com";
+
+    const chartDom = document.getElementById('sankey');
+    const myChart = echarts.init(chartDom);
+
+    async function loadData() {
+      try {
+        const res = await fetch(FUNCTION_URL); // GET -> 返回 {nodes, links}
+        const data = await res.json();
+
+        const option = {
+          backgroundColor: '#0f172a',
+          tooltip: {
+            trigger: 'item',
+            triggerOn: 'mousemove'
+          },
+          series: [{
+            type: 'sankey',
+            data: data.nodes,
+            links: data.links,
+            emphasis: {
+              focus: 'adjacency'
+            },
+            lineStyle: {
+              color: 'source',
+              curveness: 0.5
+            },
+            label: {
+              color: '#e2e8f0',
+              fontSize: 12
+            }
+          }]
+        };
+
+        myChart.setOption(option);
+      } catch (e) {
+        console.error("加载数据失败:", e);
+      }
+    }
+
+    loadData();
+
+    // 如果你想自动刷新，比如每 10 秒更新一次，可以打开这一行：
+    // setInterval(loadData, 10000);
+  </script>
+</body>
+</html>
