@@ -2,20 +2,20 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>30岁 · 我和大家的关系桑基图</title>
+  <title>30岁 · 我和我的朋友们</title>
   <style>
     body {
       margin: 0;
-      background: #0f172a;
-      color: #e2e8f0;
-      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background: #0f172a;   /* ← 页面背景颜色（可改） */
+      color: #e2e8f0;        /* ← 页面默认文字颜色（可改） */
+      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; /* ← 全局字体 */
       display: flex;
       flex-direction: column;
       height: 100vh;
     }
     header {
       padding: 16px 24px;
-      border-bottom: 1px solid #1e293b;
+      border-bottom: 1px solid #1e293b; /* ← 标题下方边框（可去掉） */
     }
     #chart {
       flex: 1;
@@ -23,23 +23,25 @@
     }
     #chart > div {
       width: 100%;
-      height: 100%;
+      height: 100%; /* ← 图表高度（可调大，例如 1200px） */
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>30岁 · 我和大家的关系桑基图（自动更新）</h1>
+    <h1>30岁 · 我和我的朋友们（自动更新）</h1>
     <div style="font-size:12px;color:#94a3b8;">
       朋友在飞书表单里的每一次填写，都会更新这张图。刷新页面即可看到最新结果。
     </div>
   </header>
+
   <div id="chart"><div id="sankey"></div></div>
 
   <!-- 引入 ECharts -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+
   <script>
-    // 把这里替换为你的函数 URL
+    // 这里是你的云函数 URL
     const FUNCTION_URL = "https://1388809978-5vlprix701.ap-guangzhou.tencentscf.com";
 
     const chartDom = document.getElementById('sankey');
@@ -47,29 +49,41 @@
 
     async function loadData() {
       try {
-        const res = await fetch(FUNCTION_URL); // GET -> 返回 {nodes, links}
-        const data = await res.json();
+        const res = await fetch(FUNCTION_URL); 
+        const data = await res.json();   // ← data = { nodes: [...], links: [...] }
 
         const option = {
-          backgroundColor: '#0f172a',
+          backgroundColor: '#0f172a',  /* ← 图表背景（可改成白色、粉色） */
+
           tooltip: {
             trigger: 'item',
             triggerOn: 'mousemove'
           },
+
           series: [{
             type: 'sankey',
-            data: data.nodes,
-            links: data.links,
+            data: data.nodes,  // ← 数据节点
+            links: data.links, // ← 数据连线
+
+            /* ← ← ← 重点：这里是优化桑基图视觉的全部入口 */
+
+            nodeWidth: 25,    // ← 节点宽度（方块粗细）
+            nodeGap: 50,      // ← 节点之间的垂直间距
+
             emphasis: {
               focus: 'adjacency'
             },
+
             lineStyle: {
-              color: 'source',
-              curveness: 0.5
+              color: 'source', /* ← 连线颜色，可改成 'gradient' 更好看 */
+              opacity: 0.4,    /* ← 连线透明度（建议 0.3~0.7） */
+              curveness: 0.4   /* ← 弧度（0~1） */
             },
+
             label: {
-              color: '#e2e8f0',
-              fontSize: 12
+              color: '#e2e8f0', /* ← 节点文字颜色 */
+              fontSize: 14,     /* ← 节点文字大小 */
+              fontWeight: 'bold' /* ← 节点文字粗细 */
             }
           }]
         };
@@ -81,9 +95,6 @@
     }
 
     loadData();
-
-    // 如果你想自动刷新，比如每 10 秒更新一次，可以打开这一行：
-    // setInterval(loadData, 10000);
   </script>
 </body>
 </html>
